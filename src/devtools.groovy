@@ -3,11 +3,27 @@
  * Created by dhelleberg on 24/09/14.
  */
 
+
+gfx_command_map = ['on' : 'visual_bars', 'off' : 'false', 'lines' : 'visual_lines']
+layout_command_map = ['on' : 'true', 'off' : 'false']
+overdraw_command_map = ['on' : 'show',  'off' : 'false', 'deut' : 'show_deuteranomaly']
+
+
+command_map = ['gfx' : gfx_command_map,
+               'layout' : layout_command_map,
+                'overdraw' : overdraw_command_map]
+
+
+
+//check args
+if(args.length != 2) {
+    printHelp()
+    System.exit(-1)
+}
+
 //get args
 String command = args[0]
 String option = args[1]
-
-def gfx_command_map = ['bars' : 'visual_bars', 'off' : 'false', 'lines' : 'visual_lines']
 
 //get adb exec
 adbExec = getAdbPath();
@@ -30,25 +46,48 @@ if(!foundDevice) {
     System.exit(-1)
 }
 
-int SYSPROPS_TRANSACTION = 1599295570 // ('_'<<24)|('S'<<16)|('P'<<8)|'R'
 
 def adbcmd = ""
 switch ( command ) {
     case "gfx" :
         adbcmd = "shell setprop debug.hwui.profile "+gfx_command_map[option]
+        break
+    case "layout" :
+        adbcmd = "shell setprop debug.layout "+layout_command_map[option]
+        break
+    case "overdraw" :
+        adbcmd = "shell setprop debug.hwui.overdraw "+overdraw_command_map[option]
+        break
+    default:
+        printHelp()
+        System.exit(-1)
+
 }
 
 def adbConnect = "$adbExec $adbcmd"
-println(adbConnect)
+//println(adbConnect)
 proc = adbConnect.execute()
 proc.waitFor()
 
-def pingService = "$adbExec shell service call activity $SYSPROPS_TRANSACTION"
-proc = pingService.execute()
-proc.waitFor()
+kickSystemService(adbExec)
+
+System.exit(0)
 
 
-private String getAdbPath() {
+
+
+
+
+void kickSystemService(String adbExec) {
+    def proc
+    int SYSPROPS_TRANSACTION = 1599295570 // ('_'<<24)|('S'<<16)|('P'<<8)|'R'
+
+    def pingService = "$adbExec shell service call activity $SYSPROPS_TRANSACTION"
+    proc = pingService.execute()
+    proc.waitFor()
+}
+
+String getAdbPath() {
     def adbExec = "adb"   //Todo: check if we need adb.exe on windows
     try {
         def command = "$adbExec"    //try it plain from the path
@@ -75,3 +114,15 @@ private String getAdbPath() {
     }
 }
 
+void printHelp() {
+    println("usage: devtools command option")
+    print("command: ")
+    command_map.each { command, options ->
+        print("\n  $command -> ")
+        options.each {
+            option, internal_cmd -> print("$option ")
+        }
+    }
+    println()
+    println()
+}
