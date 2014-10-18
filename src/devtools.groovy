@@ -136,7 +136,7 @@ String getAdbPath() {
 }
 
 void printHelp(String additionalmessage) {
-    println("usage: devtools [-v] command option")
+    println("usage: devtools.groovy [-v] command option")
     print("command: ")
     command_map.each { command, options ->
         print("\n  $command -> ")
