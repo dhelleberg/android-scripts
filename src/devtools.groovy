@@ -9,6 +9,7 @@
 gfx_command_map = ['on' : 'visual_bars', 'off' : 'false', 'lines' : 'visual_lines']
 layout_command_map = ['on' : 'true', 'off' : 'false']
 overdraw_command_map = ['on' : 'show',  'off' : 'false', 'deut' : 'show_deuteranomaly']
+overdraw_command_map_preKitKat = ['on' : 'true',  'off' : 'false']
 
 
 command_map = ['gfx' : gfx_command_map,
@@ -66,19 +67,25 @@ def adbcmd = ""
 switch ( command ) {
     case "gfx" :
         adbcmd = "shell setprop debug.hwui.profile "+gfx_command_map[option]
+        executeADBCommand(adbcmd)
         break
     case "layout" :
         adbcmd = "shell setprop debug.layout "+layout_command_map[option]
+        executeADBCommand(adbcmd)
         break
     case "overdraw" :
+        //tricky, properties have changed over time
         adbcmd = "shell setprop debug.hwui.overdraw "+overdraw_command_map[option]
+        executeADBCommand(adbcmd)
+        adbcmd = "shell setprop debug.hwui.show_overdraw "+overdraw_command_map_preKitKat[option]
+        executeADBCommand(adbcmd)
         break
     default:
         printHelp("could not find the command $command you provided")
 
 }
 
-executeADBCommand(adbcmd)
+
 
 kickSystemService()
 
