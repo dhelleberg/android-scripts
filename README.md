@@ -8,6 +8,8 @@ via devtools you can switch:
 * overdraw
 on and off via command line.
 Works on emulators and devices. And, yes: it will control multiple devices at once.
+
+Check the video:
  
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/GOJaOsJ0BJs/0.jpg)](http://www.youtube.com/watch?v=GOJaOsJ0BJs)
 
