@@ -1,7 +1,6 @@
 #!/usr/bin/env groovy
 /**
  * Created by dhelleberg on 24/09/14.
- * TODO: does not work 100% with lollipop, need to check why (kick more services I Guess...)
  * Improve command line parsing
  */
 
@@ -89,7 +88,7 @@ void kickSystemService(String adbExec) {
     def proc
     int SYSPROPS_TRANSACTION = 1599295570 // ('_'<<24)|('S'<<16)|('P'<<8)|'R'
 
-    def pingService = "$adbExec shell service call activity $SYSPROPS_TRANSACTION"
+    def pingService = "shell service call activity $SYSPROPS_TRANSACTION"
     executeADBCommand(pingService)
 }
 
