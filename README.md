@@ -11,16 +11,17 @@ Works on emulators and devices. And, yes: it will control multiple devices at on
  
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/GOJaOsJ0BJs/0.jpg)](http://www.youtube.com/watch?v=GOJaOsJ0BJs)
 
+## install
+
+Just checkout or download the scrips to your system. 
+Make sure you have groovy installed, and adb-executeable in your PATH
+
 # adbwifi
 
 Do you use adb-wifi connections? tired of figuring out the ip of your phone and typing it in? 
  
 This script tries to solve that.
 
-## install
-
-Just checkout or download adbwifi.groovy to your system. 
-Make sure you have groovy installed, and adb-executeable in your PATH
 
 ## use
 
