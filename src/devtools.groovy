@@ -1,6 +1,9 @@
 #!/usr/bin/env groovy
 /**
  * Created by dhelleberg on 24/09/14.
+ * TODO: Support multiple devices
+ * TODO: does not work 100% with lollipop, need to check why (kick more services I Guess...)
+ * Improve command line parsing
  */
 
 
@@ -13,6 +16,7 @@ command_map = ['gfx' : gfx_command_map,
                'layout' : layout_command_map,
                 'overdraw' : overdraw_command_map]
 
+verbose = true
 
 
 //check args
@@ -37,7 +41,7 @@ def foundDevice = false
 
 proc.in.text.eachLine { //start at line 1 and check for a connected device
         line, number ->
-            if(number == 1 && line.contains("device"))  //Todo this could fail because it also finds remote devices
+            if(number == 1 && line.contains("device"))
                 foundDevice = true
 }
 
@@ -64,10 +68,7 @@ switch ( command ) {
 
 }
 
-def adbConnect = "$adbExec $adbcmd"
-//println(adbConnect)
-proc = adbConnect.execute()
-proc.waitFor()
+executeADBCommand(adbcmd)
 
 kickSystemService(adbExec)
 
@@ -83,7 +84,15 @@ void kickSystemService(String adbExec) {
     int SYSPROPS_TRANSACTION = 1599295570 // ('_'<<24)|('S'<<16)|('P'<<8)|'R'
 
     def pingService = "$adbExec shell service call activity $SYSPROPS_TRANSACTION"
-    proc = pingService.execute()
+    executeADBCommand(pingService)
+}
+
+void executeADBCommand(String adbcmd) {
+    def proc
+    def adbConnect = "$adbExec $adbcmd"
+    if(verbose)
+        println("Executing $adbConnect")
+    proc = adbConnect.execute()
     proc.waitFor()
 }
 
