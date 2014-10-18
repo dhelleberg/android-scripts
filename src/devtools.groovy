@@ -1,7 +1,6 @@
 #!/usr/bin/env groovy
 /**
  * Created by dhelleberg on 24/09/14.
- * TODO: Support multiple devices
  * TODO: does not work 100% with lollipop, need to check why (kick more services I Guess...)
  * Improve command line parsing
  */
@@ -38,11 +37,18 @@ def proc = adbDevicesCmd.execute()
 proc.waitFor()
 
 def foundDevice = false
+deviceIds = []
 
 proc.in.text.eachLine { //start at line 1 and check for a connected device
         line, number ->
-            if(number == 1 && line.contains("device"))
+            if(number > 0 && line.contains("device")) {
                 foundDevice = true
+                //grep out device ids
+                def values = line.split('\\t')
+                if(verbose)
+                    println("found id: "+values[0])
+                deviceIds.add(values[0])
+            }
 }
 
 if(!foundDevice) {
@@ -88,12 +94,14 @@ void kickSystemService(String adbExec) {
 }
 
 void executeADBCommand(String adbcmd) {
-    def proc
-    def adbConnect = "$adbExec $adbcmd"
-    if(verbose)
-        println("Executing $adbConnect")
-    proc = adbConnect.execute()
-    proc.waitFor()
+    deviceIds.each { deviceId ->
+        def proc
+        def adbConnect = "$adbExec -s $deviceId $adbcmd"
+        if(verbose)
+            println("Executing $adbConnect")
+        proc = adbConnect.execute()
+        proc.waitFor()
+    }
 }
 
 String getAdbPath() {
