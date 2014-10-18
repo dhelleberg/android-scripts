@@ -15,8 +15,11 @@ def foundDevice = false
 
 proc.in.text.eachLine { //start at line 1 and check for a connected device
         line, number ->
-            if(number == 1 && line.contains("device"))  //Todo this could fail because it also finds remote devices
-                foundDevice = true
+            if(number > 0 && line.contains("device"))
+            {
+                if(!line.contains("emulator"))
+                    foundDevice = true
+            }
 }
 
 if(!foundDevice) {
@@ -34,7 +37,7 @@ if(wlanIP == "0.0.0.0") {
 
 
 println "mobile ip on WLAN: $wlanIP"
-def adbConnect = "$adbExec tcpip 5555"
+def adbConnect = "$adbExec -d tcpip 5555"
 adbConnect.execute()
 
 

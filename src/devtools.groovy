@@ -1,6 +1,7 @@
 #!/usr/bin/env groovy
 /**
  * Created by dhelleberg on 24/09/14.
+ * TODO: Check windows!
  * Improve command line parsing
  */
 
@@ -14,18 +15,23 @@ command_map = ['gfx' : gfx_command_map,
                'layout' : layout_command_map,
                 'overdraw' : overdraw_command_map]
 
-verbose = true
+verbose = false
 
-
-//check args
-if(args.length != 2) {
-    printHelp()
-    System.exit(-1)
+def cli = new CliBuilder(usage:'devtools.groovy command option')
+cli.with {
+    v longOpt: 'verbose', 'prints additional output'
 }
+def opts = cli.parse(args)
+if(!opts)
+    printHelp("not provided correct option")
+if(opts.arguments().size() != 2)
+    printHelp("you need to provide two arguments: command and option")
+if(opts.v)
+    verbose = true
 
 //get args
-String command = args[0]
-String option = args[1]
+String command = opts.arguments().get(0)
+String option = opts.arguments().get(1)
 
 //get adb exec
 adbExec = getAdbPath();
@@ -68,14 +74,13 @@ switch ( command ) {
         adbcmd = "shell setprop debug.hwui.overdraw "+overdraw_command_map[option]
         break
     default:
-        printHelp()
-        System.exit(-1)
+        printHelp("could not find the command $command you provided")
 
 }
 
 executeADBCommand(adbcmd)
 
-kickSystemService(adbExec)
+kickSystemService()
 
 System.exit(0)
 
@@ -84,7 +89,7 @@ System.exit(0)
 
 
 
-void kickSystemService(String adbExec) {
+void kickSystemService() {
     def proc
     int SYSPROPS_TRANSACTION = 1599295570 // ('_'<<24)|('S'<<16)|('P'<<8)|'R'
 
@@ -130,8 +135,8 @@ String getAdbPath() {
     }
 }
 
-void printHelp() {
-    println("usage: devtools command option")
+void printHelp(String additionalmessage) {
+    println("usage: devtools [-v] command option")
     print("command: ")
     command_map.each { command, options ->
         print("\n  $command -> ")
@@ -140,5 +145,8 @@ void printHelp() {
         }
     }
     println()
+    println("Error $additionalmessage")
     println()
+
+    System.exit(-1)
 }
