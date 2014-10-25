@@ -116,22 +116,33 @@ void executeADBCommand(String adbcmd) {
 }
 
 String getAdbPath() {
-    def adbExec = "adb"   //Todo: check if we need adb.exe on windows
+    def adbExec = "adb"
+    if(isWindows())
+        adbExec = adbExec+".exe"
     try {
         def command = "$adbExec"    //try it plain from the path
         command.execute()
+        if(verbose)
+            println("using adb in "+adbExec)
         return adbExec
     }
     catch (IOException e) {
         //next try with Android Home
         def env = System.getenv("ANDROID_HOME")
-        println("adb not in path trying Android home")
+        if(verbose)
+            println("adb not in path trying Android home")
         if (env != null && env.length() > 0) {
             //try it here
             try {
-                adbExec = env + "/platform-tools/adb"
+                adbExec = env + File.separator + "platform-tools" + File.separator + "adb"
+                if(isWindows())
+                    adbExec = adbExec+".exe"
+
                 def command = "$adbExec"// is actually a string
                 command.execute()
+                if(verbose)
+                    println("using adb in "+adbExec)
+
                 return adbExec
             }
             catch (IOException ex) {
@@ -139,7 +150,13 @@ String getAdbPath() {
                 System.exit(-1)
             }
         }
+        println("Could not find $adbExec in path and no ANDROID_HOME is set :(")
+        System.exit(-1)
     }
+}
+
+boolean isWindows() {
+    return (System.properties['os.name'].toLowerCase().contains('windows'))
 }
 
 void printHelp(String additionalmessage) {
