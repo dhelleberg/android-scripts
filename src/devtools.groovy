@@ -14,7 +14,7 @@ overdraw_command_map_preKitKat = ['on' : 'true',  'off' : 'false']
 
 command_map = ['gfx' : gfx_command_map,
                'layout' : layout_command_map,
-                'overdraw' : overdraw_command_map]
+               'overdraw' : overdraw_command_map]
 
 verbose = false
 
@@ -105,6 +105,10 @@ void kickSystemService() {
 }
 
 void executeADBCommand(String adbcmd) {
+    if(deviceIds.size == 0) {
+        println("no devices connected")
+        System.exit(-1)
+    }
     deviceIds.each { deviceId ->
         def proc
         def adbConnect = "$adbExec -s $deviceId $adbcmd"
