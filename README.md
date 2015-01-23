@@ -6,6 +6,7 @@ via devtools you can switch:
 * gfx (profile gpu rendering)
 * layout (show layout bounds)
 * overdraw
+* updates (show screen updates)
 on and off via command line.
 Works on emulators and devices. And, yes: it will control multiple devices at once.
 
