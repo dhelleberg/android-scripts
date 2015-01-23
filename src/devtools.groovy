@@ -1,7 +1,6 @@
 #!/usr/bin/env groovy
 /**
  * Created by dhelleberg on 24/09/14.
- * TODO: Check windows!
  * Improve command line parsing
  */
 
@@ -10,11 +9,13 @@ gfx_command_map = ['on' : 'visual_bars', 'off' : 'false', 'lines' : 'visual_line
 layout_command_map = ['on' : 'true', 'off' : 'false']
 overdraw_command_map = ['on' : 'show',  'off' : 'false', 'deut' : 'show_deuteranomaly']
 overdraw_command_map_preKitKat = ['on' : 'true',  'off' : 'false']
+show_updates_map = ['on' : '0',  'off' : '1']
 
 
 command_map = ['gfx' : gfx_command_map,
                'layout' : layout_command_map,
-               'overdraw' : overdraw_command_map]
+               'overdraw' : overdraw_command_map,
+               'updates' : show_updates_map]
 
 verbose = false
 
@@ -78,6 +79,10 @@ switch ( command ) {
         adbcmd = "shell setprop debug.hwui.overdraw "+overdraw_command_map[option]
         executeADBCommand(adbcmd)
         adbcmd = "shell setprop debug.hwui.show_overdraw "+overdraw_command_map_preKitKat[option]
+        executeADBCommand(adbcmd)
+        break
+    case "updates":
+        adbcmd = "shell service call SurfaceFlinger 1002 android.ui.ISurfaceComposer"+show_updates_map[option]
         executeADBCommand(adbcmd)
         break
     default:
