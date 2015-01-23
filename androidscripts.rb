@@ -3,8 +3,8 @@ require "formula"
 class Androidscripts < Formula
 
   homepage 'https://github.com/dhelleberg/android-scripts'
-  url 'https://github.com/dhelleberg/android-scripts/archive/0.9.0.tar.gz'
-  sha1 '29cbf630df0658f053b787a03ef209b617a1db20'
+  url 'https://github.com/dhelleberg/android-scripts/archive/1.0.1.tar.gz'
+  sha1 '2CB79AA61036B83399CC718033D2883C97B2347F'
   head 'https://github.com/dhelleberg/android-scripts.git'
 
   depends_on "groovy"

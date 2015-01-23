@@ -19,6 +19,10 @@ Check the video:
 Just checkout or download the scrips to your system. 
 Make sure you have groovy installed, and adb-executeable in your PATH
 
+On mac with brew just run:
+
+    brew install https://raw.githubusercontent.com/dhelleberg/android-scripts/master/androidscripts.rb
+
 # adbwifi
 
 Do you use adb-wifi connections? tired of figuring out the ip of your phone and typing it in? 
