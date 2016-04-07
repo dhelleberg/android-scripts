@@ -4,7 +4,7 @@ class Androidscripts < Formula
 
   homepage 'https://github.com/dhelleberg/android-scripts'
   url 'https://github.com/dhelleberg/android-scripts/archive/1.0.2.tar.gz'
-  sha1 'EC3247061457088699539F4391C51727DDFE5425'
+  sha1 'ec3247061457088699539f4391c51727ddfe5425'
   head 'https://github.com/dhelleberg/android-scripts.git'
 
   depends_on "groovy"
