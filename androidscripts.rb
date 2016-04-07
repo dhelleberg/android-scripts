@@ -3,7 +3,7 @@ require "formula"
 class Androidscripts < Formula
 
   homepage 'https://github.com/dhelleberg/android-scripts'
-  url 'https://github.com/dhelleberg/android-scripts/archive/1.0.2.tar.gz'
+  url 'https://github.com/dhelleberg/android-scripts/archive/1.0.3.tar.gz'
   sha1 'ec3247061457088699539f4391c51727ddfe5425'
   head 'https://github.com/dhelleberg/android-scripts.git'
 
