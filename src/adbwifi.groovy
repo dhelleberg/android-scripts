@@ -55,30 +55,48 @@ proc.waitFor()
 proc.in.text.eachLine { println(it) }
 
 private String getWlanIP(boolean tryTurnItOn) {
-    //device is there, check if wifi is running
-    def adbshellNetcfgCmd = "$adbExec -d shell netcfg"
-    proc = adbshellNetcfgCmd.execute()
+    //netcfg if only available on API level 22 and lower
+    def apilevelCmd = "$adbExec -d shell getprop ro.build.version.sdk"
+    proc = apilevelCmd.execute()
     proc.waitFor()
-
-    def ip
-
-    proc.in.text.eachMatch(/wlan.*/) {
-        if(it.contains("UP")) {
-            //try to get ip address
-            def matcher = (it =~ /([a-zA-Z|0]+)?([0-9|.]+)/)
-            String wlanIP = matcher[1][0]
-            println "WLAN IP $wlanIP"
-            if(wlanIP == "0.0.0.0" && tryTurnItOn) { //no wifi yet, try to get it up
-                turnWifiOn()
-                //on more try
-                ip = getWlanIP(false)
-            }
-            else
+    def apilevel
+    proc.in.text.eachLine { apilevel = it.toInteger() }    
+    if(apilevel > 22) {
+        //device is there, check if wifi is running
+        def adbshellNetcfgCmd = "$adbExec -d shell ip -f inet addr show wlan0"
+        proc = adbshellNetcfgCmd.execute()
+        proc.waitFor()
+        def ip
+        proc.in.text.eachMatch(/inet.*/) {
+                def matcher = (it =~ /([a-zA-Z|0]+)?([0-9|.]+)/)                
+                String wlanIP = matcher[0][0].toString()
+                println "WLAN IP $wlanIP"
                 ip = wlanIP
         }
+        return ip
     }
+    else {
+        //device is there, check if wifi is running
+        def adbshellNetcfgCmd = "$adbExec -d shell netcfg"
+        proc = adbshellNetcfgCmd.execute()
+        proc.waitFor()
 
-    return ip
+        def ip
+
+        proc.in.text.eachMatch(/wlan.*/) {
+                //try to get ip address
+                def matcher = (it =~ /([a-zA-Z|0]+)?([0-9|.]+)/)
+                String wlanIP = matcher[1][0]
+                println "WLAN IP $wlanIP"
+                if(wlanIP == "0.0.0.0" && tryTurnItOn) { //no wifi yet, try to get it up
+                    //on more try
+                    ip = getWlanIP(false)
+                }
+                else
+                    ip = wlanIP
+        }
+        return ip
+    }
 
 }
 
