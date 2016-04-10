@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 /**
- * Created by chrjsorg on 22/02/14.
+ * Created by chrjsorg parts from dhelleberg on 10/04/16.
  */
 
 //get adb exec
@@ -27,10 +27,11 @@ if(!foundDevice) {
     System.exit(-1)
 }
 
+//Min Sdk Level 19 is required
 checkForSdkLevel();
 
+//If filename is provided use it, otherwise use screenrecord.mp4
 if(args.length == 0) {
-    def millis = System.currentTimeMillis()
     executeScreenRecord("screenrecord.mp4");
 }
 else {
