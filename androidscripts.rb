@@ -12,6 +12,7 @@ class Androidscripts < Formula
   def install
     bin.install 'src/devtools.groovy' => 'devtools'
     bin.install 'src/adbwifi.groovy' => 'adbwifi'
+    bin.install 'src/adbscreenrecord.groovy' => 'adbscreenrecord'
   end
 
   test do

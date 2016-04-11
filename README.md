@@ -23,6 +23,12 @@ On mac with brew just run:
 
     brew install https://raw.githubusercontent.com/dhelleberg/android-scripts/master/androidscripts.rb
 
+# adbscreenrecord
+
+Will execute screenrecord on your API Level 19+ device and will pull the file automatically after you finish the screenrecording.
+
+    adbscreenrecord <filename.mp4, optional>
+
 # adbwifi
 
 Do you use adb-wifi connections? tired of figuring out the ip of your phone and typing it in? 
