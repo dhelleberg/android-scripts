@@ -25,16 +25,14 @@ cli.with {
 def opts = cli.parse(args)
 if(!opts)
     printHelp("not provided correct option")
-//if(opts.arguments().size() != 2)
-//printHelp("you need to provide two arguments: command and option")
+if(opts.arguments().size() != 2)
+   printHelp("you need to provide two arguments: command and option")
 if(opts.v)
     verbose = true
 
 //get args
 String command = opts.arguments().get(0)
-
-if (opts.arguments().size() > 1)
-    String option = opts.arguments().get(1)
+String option = opts.arguments().get(1)
 
 //get adb exec
 adbExec = getAdbPath();
@@ -89,9 +87,8 @@ switch ( command ) {
         executeADBCommand(adbCmd)
         break
 
-    case "reset":
-        adbCmd = buildResetCmd()
-        println(adbCmd)
+    case "date":
+        adbCmd = buildDateCommand(option);
         executeADBCommand(adbCmd)
         break
 
@@ -194,7 +191,6 @@ private boolean isNOrLater() {
 
     Integer apiLevel = 0
     proc.in.text.eachLine { apiLevel = it.toInteger() }
-    println(apiLevel)
     if (apiLevel == 0) {
         println("Could not retrieve API Level")
         System.exit(-1)
@@ -213,7 +209,14 @@ String fixFormat(String val) {
     return val;
 }
 
-String buildResetCmd() {
+String buildDateCommand(String option) {
+    switch (option) {
+        case "reset":
+            return buildResetCommand();
+    }
+}
+
+String buildResetCommand() {
     Calendar calendar = Calendar.getInstance()
     //println("Setting device date to : " + DateGroovyMethods.format(calendar.getTime(), "dd/MMM/yyyy HH:mm:ss"))
 
@@ -228,7 +231,10 @@ String buildResetCmd() {
                 monthOfYear +
                 dayOfMonth +
                 calendar.get(Calendar.HOUR_OF_DAY) +
-                minutesOfHour
+                minutesOfHour +
+                calendar.get(Calendar.YEAR) +
+                "." +
+                secondsOfMinutes
 
     } else {
         adbCmd = "shell date -s " +
