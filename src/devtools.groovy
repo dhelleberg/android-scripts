@@ -1,4 +1,5 @@
 #!/usr/bin/env groovy
+
 @Grab('joda-time:joda-time:2.9.4')
 import org.joda.time.DateTime
 import org.joda.time.format.*
@@ -16,7 +17,8 @@ show_updates_map = ['on': '0', 'off': '1']
 date_single_option_possibilites = ['reset']
 date_format_supported = ['d', 'h', 'm', 's']
 date_opration_supported = ['+', '-']
-devtools_options = ['-d', '-e', '-s']
+
+ERROR_DATE_CMD_OPTION = 0
 
 command_map = ['gfx'     : gfx_command_map,
                'layout'  : layout_command_map,
@@ -24,24 +26,46 @@ command_map = ['gfx'     : gfx_command_map,
                'updates' : show_updates_map]
 
 verbose = false
-def serialNumber
-
-/**
- * Devtools options
- */
 
 def cli = new CliBuilder(usage: 'devtools.groovy command option')
 cli.with {
     v longOpt: 'verbose', 'prints additional output'
 }
 def opts = cli.parse(args)
+if (!opts)
+    printHelp("not provided correct option")
 
-if (!opts) {
-    printDevtoolsOptionsUsageHelp("Not provided correct option")
-}
-
-if (opts.v) {
+if (opts.v)
     verbose = true
+
+//get args
+String command = opts.arguments().get(0)
+String option
+options = new String[opts.arguments().size() - 1]
+
+switch (command) {
+    case "gfx":
+    case "layout":
+    case "overdraw":
+    case "updates":
+        if (opts.arguments().size() != 2)
+            printHelp("you need to provide two arguments: command and option")
+        option = opts.arguments().get(1)
+        break
+
+    case "date":
+        for (int i = 0; i < options.length; i++) {
+            options[i] = opts.arguments().get(i + 1)
+        }
+
+        if (options.size() == 0)
+            printHelpForSpecificCommand(command)
+
+        if (options.size() == 1) {
+            if (!isAValidDateSingleOption(options[0]) && !isAValidDateOption(options[0])) {
+                printHelpForSpecificCommand(command)
+            }
+        }
 }
 
 //get adb exec
@@ -71,40 +95,6 @@ proc.in.text.eachLine {
 if (!foundDevice) {
     println("No usb devices")
     System.exit(-1)
-}
-
-/**
- * Command & Command options
- */
-//get args
-String command = opts.arguments().get(0)
-String option
-options = new String[opts.arguments().size() - 1]
-
-switch (command) {
-    case "gfx":
-    case "layout":
-    case "overdraw":
-    case "updates":
-        if (opts.arguments().size() != 2) {
-            printHelpForSpecificCommand(command, false, null)
-        }
-        option = opts.arguments().get(1)
-        break
-
-    case "date":
-        for (int i = 0; i < options.length; i++) {
-            options[i] = opts.arguments().get(i + 1)
-        }
-
-        if (options.size() == 0)
-            printHelpForSpecificCommand(command, false, null)
-
-        if (options.size() == 1) {
-            if (!isAValidDateSingleOption(options[0]) && !isAValidDateOption(options[0])) {
-                printHelpForSpecificCommand(command, false, null)
-            }
-        }
 }
 
 def adbCmd = ""
@@ -138,7 +128,7 @@ switch (command) {
         break
 
     default:
-        printHelpForSpecificCommand(command, false, null)
+        printHelp("could not find the command $command you provided")
 
 }
 
@@ -196,23 +186,23 @@ String buildDateCommand() {
 
         options.each { option ->
             if (option.length() > 4 || option.length() < 3) {
-                printHelpForSpecificCommand("date", true, option)
+                printHelp(ERROR_DATE_CMD_OPTION, option)
             }
 
             def operation = option.take(1)
             def rangeType = option.reverse().take(1).reverse()
 
             if (!(operation in date_opration_supported)) {
-                printHelpForSpecificCommand("date", true, option)
+                printHelp(ERROR_DATE_CMD_OPTION, option)
             }
 
             if (!(rangeType in date_format_supported)) {
-                printHelpForSpecificCommand("date", true, option)
+                printHelp(ERROR_DATE_CMD_OPTION, option)
             }
 
             def range = option.substring(1, option.length() - 1)
             if (!range.isNumber()) {
-                printHelpForSpecificCommand("date", true, option)
+                printHelp(ERROR_DATE_CMD_OPTION, option)
             }
 
             deviceDateTime = applyRangeToDate(deviceDateTime, operation, Integer.valueOf(range), rangeType)
@@ -344,13 +334,8 @@ private String formatDateForAdbCommand(DateTime dateTime) {
 
 /* print help */
 
-void printDevtoolsUsageHelp(String additionalMessage) {
-    if (additionalMessage) {
-        println("Error $additionalMessage")
-        println()
-    }
-
-    println("Usage: devtools.groovy [-v] command option")
+void printHelp(String additionalmessage) {
+    println("usage: devtools.groovy [-v] command option")
     print("command: ")
     command_map.each { command, options ->
         print("\n  $command -> ")
@@ -359,45 +344,25 @@ void printDevtoolsUsageHelp(String additionalMessage) {
         }
     }
     println()
-    System.exit(-1)
-}
-
-void printDevtoolsOptionsUsageHelp(String additionalMessage) {
-    println(additionalMessage)
-    println()
-    // TODO: print devtools command options: -d, -e, -s
-    println()
-
-    println("Run devtools --help for more details")
+    println("Error $additionalmessage")
     println()
 
     System.exit(-1)
 }
 
-void printHelpForSpecificCommand(String command, boolean isOptionError, String option) {
-    switch(command) {
-        case "gfx":
-        case "layout":
-        case "overdraw":
-        case "updates":
-            println("You need to provide two arguments: command and option")
+void printHelp(def err, String additionalMessage) {
+    switch (err) {
+        case ERROR_DATE_CMD_OPTION:
+            println("Error in this command option: " + additionalMessage)
+            printHelpForSpecificCommand("date " + additionalMessage)
             break
-        case "date":
-            if (isOptionError) {
-                println("Not valid command option: " + option + " for: " + command)
-            } else {
-                println("Not valid command: " + command)
-                // TODO: printDateCommandHelp
-            }
-            break
-        case "devtools":
-            printDevtoolsUsageHelp(option)
-            break
-        default:
-            println("Could not find the command $command you provided")
-            printDevtoolsUsageHelp(null)
     }
-    println()
+    System.exit(-1);
+}
+
+void printHelpForSpecificCommand(String command) {
+    println("usage: devtools.groovy [-v] command option")
+    println("Not valid command: " + command)
     System.exit(-1)
 }
 
