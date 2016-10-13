@@ -325,7 +325,7 @@ private String formatDateForAdbCommand(DateTime dateTime) {
     if (isNOrLater()) {
         dateFormat = "MMddHHmmYYYY.ss"
     } else {
-        dateFormat = "YYYYMMd.HHMMss"
+        dateFormat = "YYYYMMd.HHmmss"
     }
 
     DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(dateFormat)
