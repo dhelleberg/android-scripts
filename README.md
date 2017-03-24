@@ -7,6 +7,9 @@ via devtools you can switch:
 * layout (show layout bounds)
 * overdraw
 * updates (show screen updates)
+* wifi (enable/disable wifi)
+* data (enable/disable mobile data)
+
 on and off via command line.
 Works on emulators and devices. And, yes: it will control multiple devices at once.
 
