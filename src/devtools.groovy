@@ -10,12 +10,16 @@ layout_command_map = ['on' : 'true', 'off' : 'false']
 overdraw_command_map = ['on' : 'show',  'off' : 'false', 'deut' : 'show_deuteranomaly']
 overdraw_command_map_preKitKat = ['on' : 'true',  'off' : 'false']
 show_updates_map = ['on' : '0',  'off' : '1']
+wifi_command_map = ['on' : 'enable', 'off' : 'disable']
+data_command_map = ['on' : 'enable', 'off' : 'disable']
 
 
 command_map = ['gfx' : gfx_command_map,
                'layout' : layout_command_map,
                'overdraw' : overdraw_command_map,
-               'updates' : show_updates_map]
+               'updates' : show_updates_map,
+               'wifi' : wifi_command_map,
+               'data' : data_command_map]
 
 verbose = false
 
@@ -83,6 +87,14 @@ switch ( command ) {
         break
     case "updates":
         adbcmd = "shell service call SurfaceFlinger 1002 android.ui.ISurfaceComposer"+show_updates_map[option]
+        executeADBCommand(adbcmd)
+        break
+    case "wifi":
+        adbcmd = "shell svc wifi "+wifi_command_map[option]
+        executeADBCommand(adbcmd)
+        break
+    case "data":
+        adbcmd = "shell svc data "+data_command_map[option]
         executeADBCommand(adbcmd)
         break
     default:
